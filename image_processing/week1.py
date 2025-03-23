@@ -69,3 +69,29 @@ hsv = cv2.cvtColor(resized, cv2.COLOR_BGR2HSV)
 hsv[:, :, 1] = cv2.add(hsv[:, :, 1], 50)  # 채도값 +50
 enhanced = cv2.cvtColor(hsv, cv2.COLOR_HSV2BGR)
 cv2.imwrite("preprocessed_samples/enhanced.png", enhanced)
+
+def is_too_dark(img_bgr, brightness_threshold=50):
+    gray = cv2.cvtColor(img_bgr, cv2.COLOR_BGR2GRAY)
+    mean_val = np.mean(gray)
+    return mean_val < brightness_threshold
+
+def is_too_small(img_bgr, min_area=1000):
+    gray = cv2.cvtColor(img_bgr, cv2.COLOR_BGR2GRAY)
+    _, thresh = cv2.threshold(gray, 30, 255, cv2.THRESH_BINARY)
+    contours, _ = cv2.findContours(thresh, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+    if not contours:
+        return True
+    max_area = max(cv2.contourArea(cnt) for cnt in contours)
+    return max_area < min_area
+
+# 전처리 전에 필터링
+if is_too_dark(image):
+    print("어두워서 필터링됨!")
+else:
+    if is_too_small(image):
+        print("너무 작아서 필터링됨!")
+    else:
+        print("정상 이미지! -> 전처리 수행")
+        # 여기서 크기 조정, Grayscale, Blur, 증강 등 진행
+        # preprocessed_samples 폴더에 저장
+
