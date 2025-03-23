@@ -33,3 +33,23 @@ cv2.imwrite(f"{output_dir}/gray.png", (normalized * 255).astype(np.uint8))
 cv2.imwrite(f"{output_dir}/blurred.png", blurred)
 cv2.imwrite(f"{output_dir}/flipped.png", flipped)
 cv2.imwrite(f"{output_dir}/enhanced.png", color_enhanced)
+
+from datasets import load_dataset
+from PIL import Image
+import os
+
+# 데이터셋 로드
+dataset = load_dataset("food101", split="train[:1%]")  # 전체의 1%만 사용 (샘플용)
+
+# 저장 폴더 설정
+save_dir = "preprocessed_samples"
+os.makedirs(save_dir, exist_ok=True)
+
+# 이미지 저장
+for idx, sample in enumerate(dataset):
+    img: Image.Image = sample["image"]
+    img.save(os.path.join(save_dir, f"sample_{idx}.jpg"))
+    
+    if idx == 4:  # 샘플 5개만 저장
+        break
+
